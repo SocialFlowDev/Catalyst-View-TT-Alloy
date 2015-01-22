@@ -1,6 +1,8 @@
 Revision history for Perl extension Catalyst::View::TT::Alloy.
 
 {{ $NEXT }}
+
+0.01      2015-01-22 21:20:40+00:00 Europe/London
         - fixed error handling to match Catalyst::View::TT
 
 0.00002  2010-05-18
