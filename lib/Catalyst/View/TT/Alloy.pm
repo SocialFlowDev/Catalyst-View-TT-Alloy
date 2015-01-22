@@ -8,8 +8,7 @@ use Data::Dump qw( dump );
 use Path::Class;
 use Scalar::Util qw( weaken );
 use Template::Alloy qw( Compile Parse TT );
-
-our $VERSION = '0.00003';
+use Safe::Isa;
 
 __PACKAGE__->mk_accessors('template');
 __PACKAGE__->mk_accessors('include_path');
@@ -126,17 +125,23 @@ sub process {
         $output = $self->render($c, $template);
     };
 
-    if ($@) {
-        my $error = qq/Couldn't render template "$template"/;
-        $c->log->error($@);
-        $c->error($@);
-        return 0;
+    if (my $error = $@) {
+        my $error_string = qq/Couldn't render template "$template"/;
+        #Log::Dispatch barfs on ARRAY REF errors
+        if( $error->$_isa('Template::Alloy::Exception') ) {
+            $error = "$error_string: $error";
+            $c->log->error($error);
+            $c->error($error);
+        } else {
+            $c->log->error($error);
+            $c->error($error);
+            return 0;
+        }
     }
 
     unless ( $c->response->content_type ) {
         $c->response->content_type('text/html; charset=utf-8');
     }
-
     $c->response->body($output);
 
     return 1;
