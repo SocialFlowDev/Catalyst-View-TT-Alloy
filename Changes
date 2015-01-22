@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::View::TT::Alloy.
 
+{{ $NEXT }}
+        - fixed error handling to match Catalyst::View::TT
+
 0.00002  2010-05-18
         - Got rid of NEXT
         - Fixed warnings in test suite
