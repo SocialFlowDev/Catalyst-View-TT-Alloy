@@ -9,6 +9,7 @@ use Path::Class;
 use Scalar::Util qw( weaken );
 use Template::Alloy qw( Compile Parse TT );
 use Safe::Isa;
+use JSON::XS;
 
 __PACKAGE__->mk_accessors('template');
 __PACKAGE__->mk_accessors('include_path');
@@ -61,6 +62,8 @@ Catalyst::View::TT::Alloy - Template::Alloy (TT) View Class
     The name is [% name %]
 
 =cut
+
+my $json = JSON::XS->new->allow_nonref(1);
 
 sub _coerce_paths {
     my ( $paths, $dlim ) = shift;
@@ -168,6 +171,7 @@ sub render {
     # INCLUDE_PATH, or supports a coderef there, we need to create a 
     # new object for every call of render()
     my $tt = Template::Alloy->new($config);
+    $tt->define_vmethod('text', trusted_json => sub { $json->encode(shift) });
     my $output;
 
     unless ( $tt->process( $template, $vars, \$output ) ) {
